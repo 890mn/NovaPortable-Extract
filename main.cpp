@@ -1,6 +1,7 @@
 #include <iostream>
 #include <filesystem>
 #include <fstream>
+#include <unordered_map>
 #include <sys/stat.h>
 #include <json/json.h>
 
@@ -11,6 +12,8 @@ struct Nova {
 };
 std::vector<struct Nova> nova;
 std::vector<int> downloadList;
+unsigned int novaSize = 0;
+std::unordered_map<unsigned int, struct Nova> novaList;
 
 int fun_extract() {
     return 0;
@@ -36,13 +39,14 @@ int fun_analyze() {
 
     //Read json by <jsoncpp>
     if (reader.parse(jsFile, root)) {
-        auto jsSize = root[2]["wallpapers"].size();
-        nova.resize(jsSize);
+        novaSize = root[2]["wallpapers"].size();
+        nova.resize(novaSize);
 
-        for (unsigned int i = 0; i < jsSize; ++i) {
+        for (unsigned int i = 0; i < novaSize; ++i) {
             nova[i].format = root[2]["wallpapers"][i]["format"].asString();
             nova[i].name = root[2]["wallpapers"][i]["langName"][0]["name"].asString();
             nova[i].url = root[2]["wallpapers"][i]["videos"][0]["wallpaperVideos"][0]["videoUrl"].asString();
+            novaList.insert(std::pair<unsigned int, struct Nova>(i, nova[i]));
             outFile << nova[i].format << std::endl;
             outFile << nova[i].name << std::endl;
             outFile << nova[i].url << std::endl;
@@ -111,9 +115,7 @@ int main() {
     int dis_status = display_main();
     while (dis_status != 0) {
         if (dis_status == -1) {
-
-        }else {
-
+            dis_status = (int)novaSize;
         }
 
         dis_status = display_main();
