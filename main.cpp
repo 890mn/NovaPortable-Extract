@@ -13,9 +13,16 @@ struct Nova {
 std::vector<struct Nova> nova;
 std::vector<int> downloadList;
 unsigned int novaSize = 0;
-std::unordered_map<unsigned int, struct Nova> novaList;
+std::unordered_map<unsigned int, struct Nova> novaMap;
 
 int fun_extract() {
+    return 0;
+}
+
+int fun_download(const struct Nova& nova_piece) {
+    std::string wget = "wget --progress=bar:force " + nova_piece.url;
+    system(wget.c_str());
+    fun_extract();
     return 0;
 }
 
@@ -46,7 +53,7 @@ int fun_analyze() {
             nova[i].format = root[2]["wallpapers"][i]["format"].asString();
             nova[i].name = root[2]["wallpapers"][i]["langName"][0]["name"].asString();
             nova[i].url = root[2]["wallpapers"][i]["videos"][0]["wallpaperVideos"][0]["videoUrl"].asString();
-            novaList.insert(std::pair<unsigned int, struct Nova>(i+1, nova[i]));
+            novaMap.insert(std::pair<unsigned int, struct Nova>(i + 1, nova[i]));
             outFile << nova[i].format << std::endl;
             outFile << nova[i].name << std::endl;
             outFile << nova[i].url << std::endl;
@@ -77,14 +84,10 @@ int recover_data() {
         data.getline(buff, 200);
         nova[recover_size].url = buff;
         ++recover_size;
-        novaList.insert(std::pair<unsigned int, struct Nova>(recover_size, nova[recover_size - 1]));
+        novaMap.insert(std::pair<unsigned int, struct Nova>(recover_size, nova[recover_size - 1]));
     }
     novaSize = (unsigned int)recover_size - 1;
-    return 0;
-}
-
-int fun_download(const struct Nova& nova_piece) {
-
+    data.close();
     return 0;
 }
 
@@ -140,15 +143,16 @@ int main() {
     }
     int dis_status = display_main();
     while (dis_status != 0) {
+        /*
+         * logic error
         if (dis_status == -1) {
             dis_status = (int)novaSize;
         }
         for (int i = 0; i < dis_status; ++i) {
-            fun_download(novaList[downloadList[i]]);
+            fun_download(novaMap[downloadList[i]]);
         }
+        */
         dis_status = display_main();
     }
-
-
     return 0;
 }
