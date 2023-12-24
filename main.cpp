@@ -1,9 +1,16 @@
 #include <iostream>
 #include <filesystem>
 #include <fstream>
+#include <sys/stat.h>
 #include <json/json.h>
 
-namespace fs = std::filesystem;
+struct Nova {
+    std::string format;
+    std::string name;
+    std::string url;
+};
+std::vector<struct Nova> nova;
+std::vector<int> downloadList;
 
 int fun_extract() {
     return 0;
@@ -24,18 +31,21 @@ int fun_analyze() {
     std::ofstream outFile("output.dat", std::ios::binary);
     if (!outFile.is_open()) {
         std::cout << "Create output error." << std::endl;
-        return 2;
+        return 1;
     }
 
     //Read json by <jsoncpp>
     if (reader.parse(jsFile, root)) {
-        for (unsigned int i = 0; i < root[2]["wallpapers"].size(); ++i) {
-            std::string format = root[2]["wallpapers"][i]["format"].asString();
-            std::string name = root[2]["wallpapers"][i]["langName"][0]["name"].asString();
-            std::string video = root[2]["wallpapers"][i]["videos"][0]["wallpaperVideos"][0]["videoUrl"].asString();
-            outFile << format << std::endl;
-            outFile << name << std::endl;
-            outFile << video << std::endl;
+        auto jsSize = root[2]["wallpapers"].size();
+        nova.resize(jsSize);
+
+        for (unsigned int i = 0; i < jsSize; ++i) {
+            nova[i].format = root[2]["wallpapers"][i]["format"].asString();
+            nova[i].name = root[2]["wallpapers"][i]["langName"][0]["name"].asString();
+            nova[i].url = root[2]["wallpapers"][i]["videos"][0]["wallpaperVideos"][0]["videoUrl"].asString();
+            outFile << nova[i].format << std::endl;
+            outFile << nova[i].name << std::endl;
+            outFile << nova[i].url << std::endl;
             outFile << "Sign of end." << std::endl;
         }
     }
@@ -46,11 +56,69 @@ int fun_analyze() {
     return 0;
 }
 
-int display_main() {
+int fun_download() {
+
     return 0;
 }
 
+int display_main() {
+    std::cout << "Choose the wallpaper with format here:" << std::endl;
+    std::cout << "\n<      Input -> sum_of_wallpapers | every number of these wallpaper      >\n" << std::endl;
+    std::cout << "Here gives some examples to further understand:" << std::endl;
+    std::cout << "  For 1 file which its number is a -> please input : [1 a]" << std::endl;
+    std::cout << "  For other[x] files which numbers are [a,b,c...] -> Please input : [x a b c ...]" << std::endl;
+    std::cout << "  Specially, you can download all of them by -> [-1] and exit by -> [0]" << std::endl;
+    std::cout << "Please give your choice:";
+    int choice;
+    std::cin >> choice;
+    if (choice != 0 && choice != -1) {
+        downloadList.resize(choice);
+        for (int i = 0; i < choice; ++i) {
+            std::cin >> downloadList[i];
+        }
+    }
+    return choice;
+}
+
 int main() {
-    fun_analyze();
+    __time_t current_version = -1;
+    __time_t version = -2;
+    std::ifstream timeCheck("VersionCheck");
+    if (!timeCheck.is_open()) {
+        std::cout << "System Error." << std::endl;
+        return 0;
+    }
+    timeCheck >> version;
+    timeCheck.close();
+
+    //stack overflow <get last modify time>
+    struct stat result{};
+    if(stat("group_all_data.json", &result)==0) {
+        auto mod_time = result.st_mtime;
+        current_version = mod_time;
+    }
+
+    if (current_version != version) {
+        //update version
+        std::ofstream newVersion("VersionCheck");
+        newVersion << current_version;
+        newVersion.close();
+
+        //try analyze
+        int res = fun_analyze();
+        if (!res) return 0;
+    }
+    int dis_status = display_main();
+    while (dis_status != 0) {
+        if (dis_status == -1) {
+
+        }else {
+
+        }
+
+        dis_status = display_main();
+    }
+
+
     return 0;
 }
