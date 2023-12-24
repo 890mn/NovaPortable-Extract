@@ -24,14 +24,14 @@ int fun_analyze() {
     Json::Value root;
 
     //Read from file <group_all_data.json>
-    std::ifstream jsFile("group_all_data.json", std::ios::binary);
+    std::ifstream jsFile("../cmake-build-debug/group_all_data.json", std::ios::binary);
     if (!jsFile.is_open()) {
         std::cout << "Contain no correct json file here." << std::endl;
         return 1;
     }
 
     //Decode to output.dat
-    std::ofstream outFile("output.dat", std::ios::binary);
+    std::ofstream outFile("../cmake-build-debug/output.dat", std::ios::binary);
     if (!outFile.is_open()) {
         std::cout << "Create output error." << std::endl;
         return 1;
@@ -46,11 +46,10 @@ int fun_analyze() {
             nova[i].format = root[2]["wallpapers"][i]["format"].asString();
             nova[i].name = root[2]["wallpapers"][i]["langName"][0]["name"].asString();
             nova[i].url = root[2]["wallpapers"][i]["videos"][0]["wallpaperVideos"][0]["videoUrl"].asString();
-            novaList.insert(std::pair<unsigned int, struct Nova>(i, nova[i]));
+            novaList.insert(std::pair<unsigned int, struct Nova>(i+1, nova[i]));
             outFile << nova[i].format << std::endl;
             outFile << nova[i].name << std::endl;
             outFile << nova[i].url << std::endl;
-            outFile << "Sign of end." << std::endl;
         }
     }
 
@@ -60,7 +59,31 @@ int fun_analyze() {
     return 0;
 }
 
-int fun_download() {
+int recover_data() {
+    std::ifstream data("../cmake-build-debug/output.dat");
+    if (!data.is_open()) {
+        std::cout << "No data to recover." << std::endl;
+        return 1;
+    }
+
+    int recover_size = 0;
+    while (!data.eof()) {
+        char buff[200];
+        nova.resize(recover_size + 1);
+        data.getline(buff, 200);
+        nova[recover_size].format = buff;
+        data.getline(buff, 200);
+        nova[recover_size].name = buff;
+        data.getline(buff, 200);
+        nova[recover_size].url = buff;
+        ++recover_size;
+        novaList.insert(std::pair<unsigned int, struct Nova>(recover_size, nova[recover_size - 1]));
+    }
+    novaSize = (unsigned int)recover_size - 1;
+    return 0;
+}
+
+int fun_download(const struct Nova& nova_piece) {
 
     return 0;
 }
@@ -87,7 +110,7 @@ int display_main() {
 int main() {
     __time_t current_version = -1;
     __time_t version = -2;
-    std::ifstream timeCheck("VersionCheck");
+    std::ifstream timeCheck("../cmake-build-debug/VersionCheck");
     if (!timeCheck.is_open()) {
         std::cout << "System Error." << std::endl;
         return 0;
@@ -97,27 +120,32 @@ int main() {
 
     //stack overflow <get last modify time>
     struct stat result{};
-    if(stat("group_all_data.json", &result)==0) {
+    if(stat("../cmake-build-debug/group_all_data.json", &result)==0) {
         auto mod_time = result.st_mtime;
         current_version = mod_time;
     }
 
     if (current_version != version) {
         //update version
-        std::ofstream newVersion("VersionCheck");
+        std::ofstream newVersion("../cmake-build-debug/VersionCheck");
         newVersion << current_version;
         newVersion.close();
 
         //try analyze
         int res = fun_analyze();
-        if (!res) return 0;
+        if (res == 1) return 0;
+    }
+    else {
+        if (recover_data() == 1) return 0;
     }
     int dis_status = display_main();
     while (dis_status != 0) {
         if (dis_status == -1) {
             dis_status = (int)novaSize;
         }
-
+        for (int i = 0; i < dis_status; ++i) {
+            fun_download(novaList[downloadList[i]]);
+        }
         dis_status = display_main();
     }
 
