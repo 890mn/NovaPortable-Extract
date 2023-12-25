@@ -1,6 +1,7 @@
 #include <iostream>
 #include <filesystem>
 #include <fstream>
+#include <math.h>
 #include <unordered_map>
 #include <sys/stat.h>
 #include <json/json.h>
@@ -91,7 +92,12 @@ int recover_data() {
     return 0;
 }
 
+void display_list() {
+
+}
+
 int display_main() {
+    //info
     std::cout << "Choose the wallpaper with format here:" << std::endl;
     std::cout << "\n<      Input -> sum_of_wallpapers | every number of these wallpaper      >\n" << std::endl;
     std::cout << "Here gives some examples to further understand:" << std::endl;
@@ -99,15 +105,52 @@ int display_main() {
     std::cout << "  For other[x] files which numbers are [a,b,c...] -> Please input : [x a b c ...]" << std::endl;
     std::cout << "  Specially, you can download all of them by -> [-1] and exit by -> [0]" << std::endl;
     std::cout << "Please give your choice:";
-    int choice;
-    std::cin >> choice;
-    if (choice != 0 && choice != -1) {
-        downloadList.resize(choice);
-        for (int i = 0; i < choice; ++i) {
-            std::cin >> downloadList[i];
+
+    std::string cmd;
+    std::cin >> cmd;
+    if (cmd == "ls") {
+        std::string subCmd;
+        std::cin >> subCmd;
+        if (subCmd == "-l") {
+            display_list();
+        }
+        else {
+            display_list();
         }
     }
-    return choice;
+    else if (cmd == "do") {
+        int downSize = 0, flag = 2;
+        std::string subCmd;
+        std::cin >> subCmd;
+        if (subCmd[0] == '-') {
+            if (subCmd[1] == 's') {
+                flag = 0;
+                downSize = 1;
+            }
+            else if (subCmd[1] == 'l') {
+                flag = 1;
+                downSize = (int)novaSize;
+            }
+            else {
+                flag = 0;
+                for (int i = 1; i < subCmd.size(); ++i) {
+                    downSize += (subCmd[i] - '0') * (int)std::pow(10, subCmd.size() - i - 1);
+                }
+            }
+            return 0;
+        }
+        else {
+            std::cout << "Input Error." << std::endl;
+            return 1;
+        }
+    }
+    else if (cmd == "wq") {
+        return 0;
+    }
+    else {
+        std::cout << "Wrong input!" << std::endl;
+        return 1;
+    }
 }
 
 int main() {
@@ -141,18 +184,6 @@ int main() {
     else {
         if (recover_data() == 1) return 0;
     }
-    int dis_status = display_main();
-    while (dis_status != 0) {
-        /*
-         * logic error
-        if (dis_status == -1) {
-            dis_status = (int)novaSize;
-        }
-        for (int i = 0; i < dis_status; ++i) {
-            fun_download(novaMap[downloadList[i]]);
-        }
-        */
-        dis_status = display_main();
-    }
+    while (display_main()) ;
     return 0;
 }
