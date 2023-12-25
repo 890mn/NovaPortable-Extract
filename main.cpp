@@ -98,16 +98,30 @@ void display_list() {
 
 int display_main() {
     //info
-    std::cout << "Choose the wallpaper with format here:" << std::endl;
-    std::cout << "\n<      Input -> sum_of_wallpapers | every number of these wallpaper      >\n" << std::endl;
-    std::cout << "Here gives some examples to further understand:" << std::endl;
-    std::cout << "  For 1 file which its number is a -> please input : [1 a]" << std::endl;
-    std::cout << "  For other[x] files which numbers are [a,b,c...] -> Please input : [x a b c ...]" << std::endl;
-    std::cout << "  Specially, you can download all of them by -> [-1] and exit by -> [0]" << std::endl;
-    std::cout << "Please give your choice:";
+    std::cout << "Nova_Hinar Ver.1.0 Debian12 Release\n" << std::endl;
+    std::cout << "Function:" << std::endl;
+    std::cout << "<1> Wallpaper list" << std::endl;
+    std::cout << "  Usage:" << std::endl;
+    std::cout << "         [ls -l] -> display all wallpapers at this version" << std::endl;
+    std::cout << "         [ls -x]" << std::endl;
+
+    std::cout << "\n<2> Download" << std::endl;
+    std::cout << "  Usage:" << std::endl;
+    std::cout << "         [do -s a] -> download one file which its number is [a]" << std::endl;
+    std::cout << "         [do -x a b c..] -> download files with total [x] which numbers are [a b c..]" << std::endl;
+    std::cout << "         [do -l] -> download all of the wallpaper" << std::endl;
+
+    std::cout << "\n<3> Quit" << std::endl;
+    std::cout << "  Usage:" << std::endl;
+    std::cout << "         [wq] -> quit this program" << std::endl;
+
+    std::cout << "\nTips:";
+    std::cout << "# Please update json when there has no latest"
+    std::cout << "\nPlease give your choice:";
 
     std::string cmd;
     std::cin >> cmd;
+    //display with several mode
     if (cmd == "ls") {
         std::string subCmd;
         std::cin >> subCmd;
@@ -118,11 +132,13 @@ int display_main() {
             display_list();
         }
     }
+    //download with parameter
     else if (cmd == "do") {
         int downSize = 0, flag = 2;
         std::string subCmd;
         std::cin >> subCmd;
         if (subCmd[0] == '-') {
+            //init mode & size
             if (subCmd[1] == 's') {
                 flag = 0;
                 downSize = 1;
@@ -136,6 +152,14 @@ int display_main() {
                 for (int i = 1; i < subCmd.size(); ++i) {
                     downSize += (subCmd[i] - '0') * (int)std::pow(10, subCmd.size() - i - 1);
                 }
+            }
+
+            //main download
+            for (int i = 0; i < downSize; ++i) {
+                int single;
+                std::cin >> single;
+                if (flag == 1) fun_download(nova[i]);
+                else fun_download(nova[single]);
             }
             return 0;
         }
