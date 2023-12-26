@@ -17,6 +17,7 @@ std::vector<std::string> novaCategory = {
         "Tears of Themis", "Honkai Impact 3",
         "Genshin Impact", "Honkai: Star Rail",
         " Houkai Gakuen2", "Lumi"};
+
 unsigned int novaSize = 0;
 std::unordered_map<unsigned int, struct Nova> novaMap;
 
@@ -39,13 +40,24 @@ int fun_download_extract(const struct Nova& nova_piece) {
         std::string filename = "../output_mp4_folder/" + nova_piece.name + "_original" + output_suffix;
         std::string output_name = "../output_mp4_folder/" + nova_piece.name + output_suffix;
         std::ifstream extract_file(filename, std::ios::binary);
+        if (!extract_file.is_open()) {
+            std::cout << "Warning: Download file cannot find!" << std::endl;
+            return 1;
+        }
+
         std::ofstream output_file(output_name, std::ios::binary);
+        if (!output_file.is_open()) {
+            std::cout << "Warning: Cannot open output file!" << std::endl;
+            return 1;
+        }
+
         char buffer[1024];
         extract_file.seekg(2, std::ios::beg);
         while (!extract_file.eof()) {
             extract_file.read(buffer, sizeof(buffer));
             output_file.write(buffer, extract_file.gcount());
         }
+
         extract_file.close();
         output_file.close();
         remove(filename.c_str());
@@ -113,16 +125,11 @@ int recover_data() {
     while (!data.eof()) {
         char buff[200];
         nova.resize(recover_size + 1);
-        data.getline(buff, 200);
-        nova[recover_size].format = buff;
-        data.getline(buff, 200);
-        nova[recover_size].name = buff;
-        data.getline(buff, 200);
-        nova[recover_size].url = buff;
-        data.getline(buff, 200);
-        nova[recover_size].category = buff;
-        data.getline(buff, 200);
-        nova[recover_size].cate_en = buff;
+        data.getline(buff, 200);nova[recover_size].format = buff;
+        data.getline(buff, 200);nova[recover_size].name = buff;
+        data.getline(buff, 200);nova[recover_size].url = buff;
+        data.getline(buff, 200);nova[recover_size].category = buff;
+        data.getline(buff, 200);nova[recover_size].cate_en = buff;
         ++recover_size;
         novaMap.insert(std::pair<unsigned int, struct Nova>(recover_size, nova[recover_size - 1]));
     }
@@ -138,7 +145,6 @@ void display_list(const struct Nova& nova_piece, int order) {
 }
 
 int display_main() {
-    //info
     std::cout << "\nFunction:" << std::endl;
     std::cout << "<1> Wallpaper list" << std::endl;
     std::cout << "  Usage:" << std::endl;
@@ -152,13 +158,7 @@ int display_main() {
     std::cout << "         [do -x a b c..] -> download files with total [x] which numbers are [a b c..]" << std::endl;
     std::cout << "         [do -l] -> download all of the wallpaper" << std::endl;
 
-    std::cout << "\n<3> Search" << std::endl;
-    std::cout << "  Usage:" << std::endl;
-    std::cout << "         [fi category name] -> Complete search -> Default[-c -n include] choice MUST with 2 parameters!" << std::endl;
-    std::cout << "         [fi -c category] -> Only give category to search wallpaper" << std::endl;
-    std::cout << "         [fi -n name] -> Only give name to search wallpaper" << std::endl;
-
-    std::cout << "\n<4> Quit" << std::endl;
+    std::cout << "\n<3> Quit" << std::endl;
     std::cout << "  Usage:" << std::endl;
     std::cout << "         [wq] -> quit this program" << std::endl;
 
@@ -166,7 +166,6 @@ int display_main() {
 
     std::string cmd;
     std::cin >> cmd;
-    //display with several mode
     if (cmd == "ls") {
         std::string subCmd;
         std::cin >> subCmd;
@@ -214,13 +213,12 @@ int display_main() {
                 }
             }
 
-            //main download
             for (int i = 0; i < downSize; ++i) {
                 int single;
                 if (flag == 1) fun_download_extract(nova[i]);
                 else {
                     std::cin >> single;
-                    fun_download_extract(nova[single]);
+                    if (fun_download_extract(nova[single])) return 1;
                 }
             }
             return 0;
@@ -231,6 +229,7 @@ int display_main() {
         }
     }
     else if (cmd == "wq") {
+        std::cout << "Thanks for use.  -Hinar 2023.12" << std::endl;
         return 1;
     }
     else {
@@ -270,8 +269,12 @@ int main() {
     else {
         if (recover_data() == 1) return 0;
     }
-    std::cout << "Welcome to 「 Nova_Hinar [Debian12-Release]Ver.0.1 」\n" << std::endl;
+    std::cout << "Welcome to 「 NovaPortable-Extract By Hinar.Ver[Debian-Release 1.0] 」\n" << std::endl;
     std::cout << "Version log: Please update json when there's no latest wallpaper" << std::endl;
+    std::cout << "Version log: But the json file is dynamic so that it may lack some of wallpaper" << std::endl;
+    std::cout << "Version log: So please contact me first and I would like to give more solutions to you" << std::endl;
+    std::cout << "Version log: Post to -> linkjoestar402212@gmail.com | 1776078715@qq.com" << std::endl;
+    std::cout << "Version log: Or try github issues : " << std::endl;
     while (!display_main()) ;
     return 0;
 }
