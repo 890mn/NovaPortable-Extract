@@ -1,7 +1,6 @@
 #include <iostream>
-#include <filesystem>
 #include <fstream>
-#include <math.h>
+#include <cmath>
 #include <unordered_map>
 #include <sys/stat.h>
 #include <json/json.h>
@@ -10,9 +9,10 @@ struct Nova {
     std::string format;
     std::string name;
     std::string url;
+    std::string category;
 };
 std::vector<struct Nova> nova;
-std::vector<int> downloadList;
+//std::vector<int> downloadList;
 unsigned int novaSize = 0;
 std::unordered_map<unsigned int, struct Nova> novaMap;
 
@@ -34,14 +34,14 @@ int fun_analyze() {
     //Read from file <group_all_data.json>
     std::ifstream jsFile("../cmake-build-debug/group_all_data.json", std::ios::binary);
     if (!jsFile.is_open()) {
-        std::cout << "Contain no correct json file here." << std::endl;
+        std::cout << "Warning: Contain no correct json file here." << std::endl;
         return 1;
     }
 
     //Decode to output.dat
-    std::ofstream outFile("../cmake-build-debug/output.dat", std::ios::binary);
+    std::ofstream outFile("../cmake-build-debug/main_data", std::ios::binary);
     if (!outFile.is_open()) {
-        std::cout << "Create output error." << std::endl;
+        std::cout << "Warning: Create output error." << std::endl;
         return 1;
     }
 
@@ -62,15 +62,15 @@ int fun_analyze() {
     }
 
     //Correct analyse
-    std::cout << "Analyze ending." << std::endl;
+    std::cout << "Tips: Successfully analyzed by json." << std::endl;
     jsFile.close();
     return 0;
 }
 
 int recover_data() {
-    std::ifstream data("../cmake-build-debug/output.dat");
+    std::ifstream data("../cmake-build-debug/main_data");
     if (!data.is_open()) {
-        std::cout << "No data to recover." << std::endl;
+        std::cout << "Warning: No data to recover." << std::endl;
         return 1;
     }
 
@@ -89,6 +89,7 @@ int recover_data() {
     }
     novaSize = (unsigned int)recover_size - 1;
     data.close();
+    std::cout << "Tips: Successfully recovered by main_data." << std::endl;
     return 0;
 }
 
@@ -98,8 +99,10 @@ void display_list() {
 
 int display_main() {
     //info
-    std::cout << "Nova_Hinar Ver.1.0 Debian12 Release\n" << std::endl;
-    std::cout << "Function:" << std::endl;
+    std::cout << "Welcome to 「 Nova_Hinar [Debian12-Release]Ver.0.1 」\n" << std::endl;
+    std::cout << "Version log: Please update json when there's no latest wallpaper" << std::endl;
+
+    std::cout << "\nFunction:" << std::endl;
     std::cout << "<1> Wallpaper list" << std::endl;
     std::cout << "  Usage:" << std::endl;
     std::cout << "         [ls -l] -> display all wallpapers at this version" << std::endl;
@@ -111,12 +114,16 @@ int display_main() {
     std::cout << "         [do -x a b c..] -> download files with total [x] which numbers are [a b c..]" << std::endl;
     std::cout << "         [do -l] -> download all of the wallpaper" << std::endl;
 
-    std::cout << "\n<3> Quit" << std::endl;
+    std::cout << "\n<3> Search" << std::endl;
+    std::cout << "  Usage:" << std::endl;
+    std::cout << "         [fi category name] -> Complete search -> Default[-c -n include] choice MUST with 2 parameters!" << std::endl;
+    std::cout << "         [fi -c category] -> Only give category to search wallpaper" << std::endl;
+    std::cout << "         [fi -n name] -> Only give name to search wallpaper" << std::endl;
+
+    std::cout << "\n<4> Quit" << std::endl;
     std::cout << "  Usage:" << std::endl;
     std::cout << "         [wq] -> quit this program" << std::endl;
 
-    std::cout << "\nTips:";
-    std::cout << "# Please update json when there has no latest"
     std::cout << "\nPlease give your choice:";
 
     std::string cmd;
@@ -131,10 +138,11 @@ int display_main() {
         else {
             display_list();
         }
+        return 0;
     }
     //download with parameter
     else if (cmd == "do") {
-        int downSize = 0, flag = 2;
+        int downSize = 0, flag;
         std::string subCmd;
         std::cin >> subCmd;
         if (subCmd[0] == '-') {
@@ -164,15 +172,15 @@ int display_main() {
             return 0;
         }
         else {
-            std::cout << "Input Error." << std::endl;
+            std::cout << "Warning: Input Error." << std::endl;
             return 1;
         }
     }
     else if (cmd == "wq") {
-        return 0;
+        return 1;
     }
     else {
-        std::cout << "Wrong input!" << std::endl;
+        std::cout << "Warning: Wrong input!" << std::endl;
         return 1;
     }
 }
@@ -182,7 +190,7 @@ int main() {
     __time_t version = -2;
     std::ifstream timeCheck("../cmake-build-debug/VersionCheck");
     if (!timeCheck.is_open()) {
-        std::cout << "System Error." << std::endl;
+        std::cout << "Warning: System Error." << std::endl;
         return 0;
     }
     timeCheck >> version;
@@ -208,6 +216,6 @@ int main() {
     else {
         if (recover_data() == 1) return 0;
     }
-    while (display_main()) ;
+    while (!display_main()) ;
     return 0;
 }
