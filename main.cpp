@@ -10,9 +10,14 @@ struct Nova {
     std::string name;
     std::string url;
     std::string category;
+    std::string cate_en; //use English name instead chinese -> solve utf-8 & gbk trans problem
 };
 std::vector<struct Nova> nova;
 //std::vector<int> downloadList;
+std::vector<std::string> novaCategory = {
+        "Tears of Themis", "Honkai Impact 3",
+        "Genshin Impact", "Honkai: Star Rail",
+        " Houkai Gakuen2", "Lumi"};
 unsigned int novaSize = 0;
 std::unordered_map<unsigned int, struct Nova> novaMap;
 
@@ -53,11 +58,16 @@ int fun_analyze() {
         for (unsigned int i = 0; i < novaSize; ++i) {
             nova[i].format = root[2]["wallpapers"][i]["format"].asString();
             nova[i].name = root[2]["wallpapers"][i]["langName"][0]["name"].asString();
+            // English : nova[i].name = root[2]["wallpapers"][i]["langName"][1]["name"].asString();
             nova[i].url = root[2]["wallpapers"][i]["videos"][0]["wallpaperVideos"][0]["videoUrl"].asString();
+            nova[i].category = root[2]["wallpapers"][i]["tags"][0]["lang_name"][0]["name"].asString();
+            nova[i].cate_en = root[2]["wallpapers"][i]["tags"][0]["lang_name"][1]["name"].asString();
             novaMap.insert(std::pair<unsigned int, struct Nova>(i + 1, nova[i]));
             outFile << nova[i].format << std::endl;
             outFile << nova[i].name << std::endl;
             outFile << nova[i].url << std::endl;
+            outFile << nova[i].category << std::endl;
+            outFile << nova[i].cate_en << std::endl;
         }
     }
 
@@ -84,6 +94,10 @@ int recover_data() {
         nova[recover_size].name = buff;
         data.getline(buff, 200);
         nova[recover_size].url = buff;
+        data.getline(buff, 200);
+        nova[recover_size].category = buff;
+        data.getline(buff, 200);
+        nova[recover_size].cate_en = buff;
         ++recover_size;
         novaMap.insert(std::pair<unsigned int, struct Nova>(recover_size, nova[recover_size - 1]));
     }
@@ -93,20 +107,19 @@ int recover_data() {
     return 0;
 }
 
-void display_list() {
-
+void display_list(const struct Nova& nova_piece, int order) {
+    std::cout << "Name: " << nova_piece.name << std::endl;
+    std::cout << "[Order]: " << order << "      [Status]: " << nova_piece.format << "       [Category]: " << nova_piece.category << std::endl;
 }
 
 int display_main() {
     //info
-    std::cout << "Welcome to 「 Nova_Hinar [Debian12-Release]Ver.0.1 」\n" << std::endl;
-    std::cout << "Version log: Please update json when there's no latest wallpaper" << std::endl;
-
     std::cout << "\nFunction:" << std::endl;
     std::cout << "<1> Wallpaper list" << std::endl;
     std::cout << "  Usage:" << std::endl;
     std::cout << "         [ls -l] -> display all wallpapers at this version" << std::endl;
-    std::cout << "         [ls -x]" << std::endl;
+    std::cout << "         [ls -x] -> display category with number here" << std::endl;
+    std::cout << "         1 - 未定事件簿  |  2 - 崩坏3  |  3 - 原神  |  4 - 崩坏星穹铁道  |  5 - 崩坏学园2  |  6 - yoyo鹿鸣" << std::endl;
 
     std::cout << "\n<2> Download" << std::endl;
     std::cout << "  Usage:" << std::endl;
@@ -133,10 +146,13 @@ int display_main() {
         std::string subCmd;
         std::cin >> subCmd;
         if (subCmd == "-l") {
-            display_list();
+            for (int cnt = 0; cnt < novaSize; ++cnt) {
+                display_list(nova[cnt], cnt);
+                std::cout << std::endl;
+            }
         }
         else {
-            display_list();
+
         }
         return 0;
     }
@@ -216,6 +232,8 @@ int main() {
     else {
         if (recover_data() == 1) return 0;
     }
+    std::cout << "Welcome to 「 Nova_Hinar [Debian12-Release]Ver.0.1 」\n" << std::endl;
+    std::cout << "Version log: Please update json when there's no latest wallpaper" << std::endl;
     while (!display_main()) ;
     return 0;
 }
