@@ -152,7 +152,18 @@ int display_main() {
             }
         }
         else {
-
+            int cate_choice = subCmd[1] - '1';
+            if (cate_choice < 0 || cate_choice > 6) {
+                std::cout << "Warning: Out of range." << std::endl;
+                return 1;
+            }
+            std::string cateList = novaCategory[cate_choice];
+            for (int cnt = 0; cnt < novaSize; ++cnt) {
+                if (nova[cnt].cate_en == cateList) {
+                    display_list(nova[cnt], cnt);
+                    std::cout << std::endl;
+                }
+            }
         }
         return 0;
     }
