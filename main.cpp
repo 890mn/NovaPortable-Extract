@@ -13,7 +13,6 @@ struct Nova {
     std::string cate_en; //use English name instead chinese -> solve utf-8 & gbk trans problem
 };
 std::vector<struct Nova> nova;
-//std::vector<int> downloadList;
 std::vector<std::string> novaCategory = {
         "Tears of Themis", "Honkai Impact 3",
         "Genshin Impact", "Honkai: Star Rail",
@@ -21,14 +20,40 @@ std::vector<std::string> novaCategory = {
 unsigned int novaSize = 0;
 std::unordered_map<unsigned int, struct Nova> novaMap;
 
-int fun_extract() {
-    return 0;
-}
-
-int fun_download(const struct Nova& nova_piece) {
-    std::string wget = "wget --progress=bar:force " + nova_piece.url;
+int fun_download_extract(const struct Nova& nova_piece) {
+    std::string output_folder;
+    std::string output_suffix;
+    if (nova_piece.format == "Static") {
+        output_folder = "../output_png_folder/";
+        output_suffix = ".png";
+    }
+    else {
+        output_folder = "../output_mp4_folder/";
+        output_suffix = ".mp4";
+    }
+    std::string wget = "wget -O " + output_folder + nova_piece.name
+            + "_original" + output_suffix
+            + " --progress=bar:force " + nova_piece.url;
     system(wget.c_str());
-    fun_extract();
+    if (nova_piece.format == "Dynamic") {
+        std::string filename = "../output_mp4_folder/" + nova_piece.name + "_original" + output_suffix;
+        std::string output_name = "../output_mp4_folder/" + nova_piece.name + output_suffix;
+        std::ifstream extract_file(filename, std::ios::binary);
+        std::ofstream output_file(output_name, std::ios::binary);
+        char buffer[1024];
+        extract_file.seekg(2, std::ios::beg);
+        while (!extract_file.eof()) {
+            extract_file.read(buffer, sizeof(buffer));
+            output_file.write(buffer, extract_file.gcount());
+        }
+        extract_file.close();
+        output_file.close();
+        remove(filename.c_str());
+        std::cout << "Download " + nova_piece.name + " to ../output_mp4_folder successfully." << std::endl;
+    }
+    else {
+        std::cout << "Download " + nova_piece.name + " to ../output_png_folder successfully." << std::endl;
+    }
     return 0;
 }
 
@@ -109,7 +134,7 @@ int recover_data() {
 
 void display_list(const struct Nova& nova_piece, int order) {
     std::cout << "Name: " << nova_piece.name << std::endl;
-    std::cout << "[Order]: " << order << "      [Status]: " << nova_piece.format << "       [Category]: " << nova_piece.category << std::endl;
+    std::cout << "[Order]: " << order << "      [Format]: " << nova_piece.format << "       [Category]: " << nova_piece.category << std::endl;
 }
 
 int display_main() {
@@ -192,9 +217,11 @@ int display_main() {
             //main download
             for (int i = 0; i < downSize; ++i) {
                 int single;
-                std::cin >> single;
-                if (flag == 1) fun_download(nova[i]);
-                else fun_download(nova[single]);
+                if (flag == 1) fun_download_extract(nova[i]);
+                else {
+                    std::cin >> single;
+                    fun_download_extract(nova[single]);
+                }
             }
             return 0;
         }
