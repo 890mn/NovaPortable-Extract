@@ -1,13 +1,13 @@
 cmake_minimum_required(VERSION 3.27)
 project(Nova_Debian)
+# c++17 standard
+set(CMAKE_CXX_STANDARD 17)
 
-set(CMAKE_CXX_STANDARD 23)
-add_executable(Nova_Debian main.cpp
-)
+include_directories(include include/json)
 
-set(lib_DIR /usr/lib/x84_64-linux-gnu)
-
-link_directories(${lib_DIR})
-
-target_link_libraries(Nova_Debian libjsoncpp.a)
-
+#add_compile_options(-fPIC)
+# source file
+aux_source_directory(./src DIR_SRC)
+aux_source_directory(./include DIR_INS)
+# compile file
+add_executable(Nova_Debian ${DIR_SRC} ${DIR_INS})
