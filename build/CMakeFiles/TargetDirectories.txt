@@ -1,3 +1,0 @@
-/home/hinar/code/project/Nova_Debian/build/CMakeFiles/Nova_Debian.dir
-/home/hinar/code/project/Nova_Debian/build/CMakeFiles/edit_cache.dir
-/home/hinar/code/project/Nova_Debian/build/CMakeFiles/rebuild_cache.dir
