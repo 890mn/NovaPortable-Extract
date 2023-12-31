@@ -4,7 +4,7 @@
 
 ## 3rdParty:
 - [Jsoncpp](https://github.com/open-source-parsers/jsoncpp)
-- 
+
 ## Require:
 - Debian or other Linux : `sudo apt install wget cmake`
 - Windows : <https://cmake.org/download/>
