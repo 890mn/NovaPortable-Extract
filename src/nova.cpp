@@ -6,8 +6,8 @@
 #include <cmath>
 
 int Nova::versionCheck(Nova* no) {
-    __time_t current_version = -1;
-    __time_t version = -2;
+    time_t current_version = -1;
+    time_t version = -2;
     std::ifstream timeCheck("../data/VersionCheck");
     if (!timeCheck.is_open()) {
         std::cout << "Warning: System Error." << std::endl;
