@@ -5,6 +5,8 @@
 ## 3rdParty:
 - [Jsoncpp](https://github.com/open-source-parsers/jsoncpp)
 
+## Warning:
+- Garbled characters will appear under Windows and have not been fixed yet
 ## Require:
 - Debian or other Linux : `sudo apt install wget cmake`
 - Windows : <https://cmake.org/download/>
