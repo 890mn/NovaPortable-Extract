@@ -2,6 +2,9 @@
 - 12/28 : Reconstructed directory structure branch
 - 12/31 : Complete README 
 
+## 3rdParty:
+- [Jsoncpp](https://github.com/open-source-parsers/jsoncpp)
+- 
 ## Require:
 - Debian or other Linux : `sudo apt install wget cmake`
 - Windows : <https://cmake.org/download/>
