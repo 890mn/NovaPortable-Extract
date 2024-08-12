@@ -121,10 +121,10 @@ int Nova::download_extract(const Nova::Nova_data& nova_piece) {
         output_folder = "../output/output_mp4_folder/";
         output_suffix = ".mp4";
     }
-    std::string wget = "wget -O " + output_folder + nova_piece.name
-                       + "_original" + output_suffix
-                       + " --progress=bar:force " + nova_piece.url;
+    std::string agent = "--user-agent=\"Mozilla\"";
+    std::string wget = "wget " + agent + " -O " + filename + " --progress=bar:force " + nova_piece.url;
     system(wget.c_str());
+    
     if (nova_piece.format == "Dynamic") {
         std::string filename = "../output/output_mp4_folder/" + nova_piece.name + "_original" + output_suffix;
         std::string output_name = "../output/output_mp4_folder/" + nova_piece.name + output_suffix;
