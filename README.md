@@ -1,18 +1,20 @@
 ## Log:
-- 12/28 : Reconstructed directory structure branch
-- 12/31 : Complete README 
+- 23/12/28 : Reconstructed directory structure branch
+- 23/12/31 : Complete README 
+- 24/ 9/24 : Fix wget agent
 
 ## 3rdParty:
 - [Jsoncpp](https://github.com/open-source-parsers/jsoncpp)
 
 ## Warning:
 - Garbled characters will appear under Windows and have not been fixed yet
+
 ## Require:
 - Debian or other Linux : `sudo apt install wget cmake`
 - Windows : <https://cmake.org/download/>
 
 ## Usage:
-- Compile:
+- Compile(Already conclude the COMPILED file in build):
     1. `git clone https://github.com/890mn/NovaPortable-Extract.git`
     2. `cd NovaPortable-Extract/build`
     3. `cmake ..`
