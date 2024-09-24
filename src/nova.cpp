@@ -122,7 +122,7 @@ int Nova::download_extract(const Nova::Nova_data& nova_piece) {
         output_suffix = ".mp4";
     }
     std::string agent = "--user-agent=\"Mozilla\"";
-    std::string wget = "wget " + agent + " -O " + filename + " --progress=bar:force " + nova_piece.url;
+    std::string wget = "wget " + agent + " -O " + " --progress=bar:force " + nova_piece.url;
     system(wget.c_str());
     
     if (nova_piece.format == "Dynamic") {
